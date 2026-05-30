@@ -26,7 +26,7 @@ six physical setups that vary lamp count, room reflectance, and diffusion.
 | `Unreal Engine Plugin/LuxMeterCalc/` | UE5 editor plugin: virtual IES light, light-meter and reflector actors, a comparison UI, and a bundled local **Calculator** service (Python / FastAPI) that performs the photometric math. |
 | `Hilfstools/` *(helper tools)* | **ImageAnalyzer** — OCRs a light-meter's display from a video into a CSV / SRT timeline (Tesseract). • **solveTrackingData** — Blender add-on that solves OptiTrack (Motive) rigid-body CSV exports. • **coordinate_converter.html** — browser tool for converting coordinates into UE space. |
 | `Messdaten/` *(measurement data)* | Raw and processed data for the six setups (*Aufbau 1–6*): Sekonic readings, OptiTrack tracks, solved poses, IES profiles, calibration runs, and the aggregated `FINALDATA.xlsx`. |
-| `p/` | Interactive 3D scatterplots that visualize the processed data of the six setups. They are produced with Plotly. |
+| `p/` *(HTML documents)* | Interactive 3D scatterplots that visualize the processed data of the six setups. They are produced with Plotly. |
 
 ## Quick start — the Calculator service
 
