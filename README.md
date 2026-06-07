@@ -61,7 +61,3 @@ The Blender add-on lives in `Hilfstools/solveTrackingData/` — install
 - **Python 3.10+** — for the Calculator and ImageAnalyzer
 - **Tesseract OCR** and **ffmpeg/ffprobe** — for ImageAnalyzer
 - **Blender** — for the tracking solver
-
-## License & citation
-
-Developed as part of a Bachelor's thesis. By Onno at HdM Stuttgart in June 2026.
