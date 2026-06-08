@@ -1,0 +1,3 @@
+python app.py your_video.mp4 --out dataset.csv --allow-decimal
+
+python csv_to_srt.py dataset.csv --show-frame

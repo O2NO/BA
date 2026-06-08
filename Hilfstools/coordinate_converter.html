@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coordinate Converter → Unreal Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 680px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .logo {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    h1 { font-size: 1.25rem; font-weight: 700; color: #f1f5f9; }
+    .subtitle { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
+
+    .badge-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.03em;
+    }
+    .badge-in  { background: #1e2d40; color: #60a5fa; border: 1px solid #2563eb44; }
+    .badge-out { background: #1e3328; color: #4ade80; border: 1px solid #16a34a44; }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 0.75rem;
+    }
+
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .axis-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .x { background: #f87171; }
+    .y { background: #4ade80; }
+    .z { background: #60a5fa; }
+    .w { background: #c084fc; }
+
+    input[type="number"] {
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
+      width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px #6366f122;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #2d3148;
+      margin: 1.5rem 0;
+    }
+
+    .convert-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 1.5rem 0 0;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .convert-btn:hover  { opacity: 0.9; }
+    .convert-btn:active { transform: scale(0.99); }
+
+    .output-panel {
+      margin-top: 1.5rem;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: none;
+    }
+    .output-panel.visible { display: block; }
+
+    .out-group { margin-bottom: 1.25rem; }
+    .out-group:last-child { margin-bottom: 0; }
+
+    .out-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .out-grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+
+    .out-field {
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .out-field .out-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 2px;
+    }
+
+    .out-field .out-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .copy-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1rem;
+    }
+
+    .copy-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #1e2d40;
+      color: #60a5fa;
+      border: 1px solid #2563eb44;
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover { background: #1e3a5f; }
+
+    select {
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
+      width: 100%;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2rem;
+    }
+    select:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px #6366f122;
+    }
+    select option { background: #1a1d27; }
+
+    .info-box {
+      background: #1a2035;
+      border: 1px solid #2d3f6b;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.72rem;
+      color: #7c93bb;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .info-box strong { color: #93b4e8; }
+
+    @media (max-width: 480px) {
+      .grid3, .grid4, .out-grid, .out-grid4 { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <div class="header">
+    <div class="logo">🎮</div>
+    <div>
+      <h1>Coordinate Converter</h1>
+      <div class="subtitle">Custom Space → Unreal Engine</div>
+    </div>
+  </div>
+
+  <div class="badge-row">
+    <span class="badge badge-in">INPUT: Y-up · X-right · Z-towards · mm</span>
+    <span class="badge badge-out">OUTPUT: Unreal Z-up · Left-handed · cm</span>
+  </div>
+
+  <div class="info-box">
+    <strong>Conversion rules applied:</strong><br>
+    • <strong>Position:</strong> UE.X = Z, &nbsp;UE.Y = −X, &nbsp;UE.Z = Y &nbsp;·&nbsp; mm ÷ 10 → cm<br>
+    • <strong>Rotation:</strong> <code style="color:#93b4e8;font-size:0.75rem;">q_ue = normalize(qz, −qx, qy, −qw)</code>
+  </div>
+
+  <hr class="divider" style="margin-top:0;"/>
+
+  <!-- POSITION INPUT -->
+  <div class="section-label">Position (mm)</div>
+  <div class="grid3">
+    <div class="field">
+      <label><span class="axis-dot x"></span> X — Right</label>
+      <input type="number" id="px" value="0" step="any"/>
+    </div>
+    <div class="field">
+      <label><span class="axis-dot y"></span> Y — Up</label>
+      <input type="number" id="py" value="0" step="any"/>
+    </div>
+    <div class="field">
+      <label><span class="axis-dot z"></span> Z — Towards</label>
+      <input type="number" id="pz" value="0" step="any"/>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- QUATERNION INPUT -->
+  <div class="section-label">Quaternion Rotation</div>
+  <div class="grid4">
+    <div class="field">
+      <label><span class="axis-dot x"></span> X</label>
+      <input type="number" id="qx" value="0" step="any"/>
+    </div>
+    <div class="field">
+      <label><span class="axis-dot y"></span> Y</label>
+      <input type="number" id="qy" value="0" step="any"/>
+    </div>
+    <div class="field">
+      <label><span class="axis-dot z"></span> Z</label>
+      <input type="number" id="qz" value="0" step="any"/>
+    </div>
+    <div class="field">
+      <label><span class="axis-dot w"></span> W</label>
+      <input type="number" id="qw" value="1" step="any"/>
+    </div>
+  </div>
+
+  <button class="convert-btn" onclick="convert()">⟶ Convert to Unreal Engine</button>
+
+  <!-- OUTPUT -->
+  <div class="output-panel" id="output">
+
+    <div class="out-group">
+      <div class="section-label" style="margin-bottom:0.6rem;">📍 Position (cm) — Unreal</div>
+      <div class="out-grid">
+        <div class="out-field">
+          <div class="out-label"><span class="axis-dot x" style="display:inline-block;margin-right:3px;"></span>X (UE)</div>
+          <div class="out-value" id="out-x">—</div>
+        </div>
+        <div class="out-field">
+          <div class="out-label"><span class="axis-dot y" style="display:inline-block;margin-right:3px;"></span>Y (UE)</div>
+          <div class="out-value" id="out-y">—</div>
+        </div>
+        <div class="out-field">
+          <div class="out-label"><span class="axis-dot z" style="display:inline-block;margin-right:3px;"></span>Z (UE)</div>
+          <div class="out-value" id="out-z">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="out-group">
+      <div class="section-label" style="margin-bottom:0.6rem;">🔄 Rotation (degrees) — Unreal</div>
+      <div class="out-grid">
+        <div class="out-field" style="border-color:#4ade8044;">
+          <div class="out-label" style="color:#4ade80;">▲ Pitch — Nicken (Y)</div>
+          <div class="out-value" id="out-pitch" style="color:#4ade80;">—</div>
+        </div>
+        <div class="out-field" style="border-color:#60a5fa44;">
+          <div class="out-label" style="color:#60a5fa;">↻ Yaw — Gieren (Z)</div>
+          <div class="out-value" id="out-yaw" style="color:#60a5fa;">—</div>
+        </div>
+        <div class="out-field" style="border-color:#f8717144;">
+          <div class="out-label" style="color:#f87171;">↺ Roll — Rollen (X)</div>
+          <div class="out-value" id="out-roll" style="color:#f87171;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="out-group">
+      <div class="section-label" style="margin-bottom:0.6rem;">💠 Quaternion — Unreal</div>
+      <div class="out-grid4">
+        <div class="out-field" style="border-color:#f8717144;">
+          <div class="out-label" style="color:#f87171;"><span class="axis-dot x" style="display:inline-block;margin-right:3px;"></span>X</div>
+          <div class="out-value" id="out-qx" style="color:#f87171;">—</div>
+        </div>
+        <div class="out-field" style="border-color:#4ade8044;">
+          <div class="out-label" style="color:#4ade80;"><span class="axis-dot y" style="display:inline-block;margin-right:3px;"></span>Y</div>
+          <div class="out-value" id="out-qy" style="color:#4ade80;">—</div>
+        </div>
+        <div class="out-field" style="border-color:#60a5fa44;">
+          <div class="out-label" style="color:#60a5fa;"><span class="axis-dot z" style="display:inline-block;margin-right:3px;"></span>Z</div>
+          <div class="out-value" id="out-qz" style="color:#60a5fa;">—</div>
+        </div>
+        <div class="out-field" style="border-color:#c084fc44;">
+          <div class="out-label" style="color:#c084fc;"><span class="axis-dot w" style="display:inline-block;margin-right:3px;"></span>W</div>
+          <div class="out-value" id="out-qw" style="color:#c084fc;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="copy-row">
+      <button class="copy-btn" onclick="copyAll()">📋 Copy all values</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function applyPreset() {} // no-op, kept for safety
+
+  // Quaternion multiply: q1 * q2
+  function quatMul(ax, ay, az, aw, bx, by, bz, bw) {
+    return {
+      x: aw*bx + ax*bw + ay*bz - az*by,
+      y: aw*by - ax*bz + ay*bw + az*bx,
+      z: aw*bz + ax*by - ay*bx + az*bw,
+      w: aw*bw - ax*bx - ay*by - az*bz,
+    };
+  }
+
+  function fmt(v) {
+    return parseFloat(v.toFixed(4)).toString();
+  }
+
+  function quatToEulerUE(qx, qy, qz, qw) {
+    // Matches Unreal Engine's FQuat::Rotator() exactly.
+    // UE convention: Pitch = rotation about Y, Yaw = about Z, Roll = about X
+    // (left-handed, Z-up). The signs differ from the standard right-handed ZYX.
+
+    const SingularityTest = qz * qx - qw * qy;
+    const YawY = 2.0 * (qw * qz + qx * qy);
+    const YawX = (1.0 - 2.0 * (qy * qy + qz * qz));
+
+    const SINGULARITY_THRESHOLD = 0.4999995;
+    const RAD_TO_DEG = 180.0 / Math.PI;
+
+    let pitch, yaw, roll;
+
+    if (SingularityTest < -SINGULARITY_THRESHOLD) {
+      pitch = -90.0;
+      yaw   = Math.atan2(YawY, YawX) * RAD_TO_DEG;
+      roll  = (-yaw - (2.0 * Math.atan2(qx, qw) * RAD_TO_DEG));
+    } else if (SingularityTest > SINGULARITY_THRESHOLD) {
+      pitch = 90.0;
+      yaw   = Math.atan2(YawY, YawX) * RAD_TO_DEG;
+      roll  = (yaw - (2.0 * Math.atan2(qx, qw) * RAD_TO_DEG));
+    } else {
+      pitch = Math.asin(2.0 * SingularityTest) * RAD_TO_DEG;
+      yaw   = Math.atan2(YawY, YawX) * RAD_TO_DEG;
+      roll  = Math.atan2(-2.0 * (qw * qx + qy * qz),
+                         (1.0 - 2.0 * (qx * qx + qy * qy))) * RAD_TO_DEG;
+    }
+
+    return { pitch, yaw, roll };
+  }
+
+  function convert() {
+    // Read position
+    const px = parseFloat(document.getElementById('px').value) || 0;
+    const py = parseFloat(document.getElementById('py').value) || 0;
+    const pz = parseFloat(document.getElementById('pz').value) || 0;
+
+    // Read quaternion
+    let qx = parseFloat(document.getElementById('qx').value) || 0;
+    let qy = parseFloat(document.getElementById('qy').value) || 0;
+    let qz = parseFloat(document.getElementById('qz').value) || 0;
+    let qw = parseFloat(document.getElementById('qw').value);
+    if (isNaN(qw)) qw = 1;
+
+    // Normalize quaternion
+    const qlen = Math.sqrt(qx*qx + qy*qy + qz*qz + qw*qw);
+    if (qlen > 0) { qx /= qlen; qy /= qlen; qz /= qlen; qw /= qlen; }
+
+    // --- Position: UE.X=Z, UE.Y=-X, UE.Z=Y, mm→cm ---
+    const ue_x =  pz / 10;
+    const ue_y = -px / 10;
+    const ue_z =  py / 10;
+
+    // --- Rotation: q_ue = normalize(qz, -qx, qy, -qw) ---
+    const rx =  qz, ry = -qx, rz = qy, rw = -qw;
+    const rlen = Math.sqrt(rx*rx + ry*ry + rz*rz + rw*rw);
+    const final = { x: rx/rlen, y: ry/rlen, z: rz/rlen, w: rw/rlen };
+
+    const { pitch, yaw, roll } = quatToEulerUE(final.x, final.y, final.z, final.w);
+
+    // Display
+    document.getElementById('out-x').textContent     = fmt(ue_x) + ' cm';
+    document.getElementById('out-y').textContent     = fmt(ue_y) + ' cm';
+    document.getElementById('out-z').textContent     = fmt(ue_z) + ' cm';
+    document.getElementById('out-pitch').textContent = fmt(pitch) + '°';
+    document.getElementById('out-yaw').textContent   = fmt(yaw)   + '°';
+    document.getElementById('out-roll').textContent  = fmt(roll)  + '°';
+    document.getElementById('out-qx').textContent   = fmt(final.x);
+    document.getElementById('out-qy').textContent   = fmt(final.y);
+    document.getElementById('out-qz').textContent   = fmt(final.z);
+    document.getElementById('out-qw').textContent   = fmt(final.w);
+
+    document.getElementById('output').classList.add('visible');
+  }
+
+  function copyAll() {
+    const x     = document.getElementById('out-x').textContent;
+    const y     = document.getElementById('out-y').textContent;
+    const z     = document.getElementById('out-z').textContent;
+    const pitch = document.getElementById('out-pitch').textContent;
+    const yaw   = document.getElementById('out-yaw').textContent;
+    const roll  = document.getElementById('out-roll').textContent;
+    const qx    = document.getElementById('out-qx').textContent;
+    const qy    = document.getElementById('out-qy').textContent;
+    const qz    = document.getElementById('out-qz').textContent;
+    const qw    = document.getElementById('out-qw').textContent;
+
+    const text =
+      `Position (UE cm): X=${x}  Y=${y}  Z=${z}\n` +
+      `Rotation (UE °):  Pitch=${pitch}  Yaw=${yaw}  Roll=${roll}\n` +
+      `Quaternion (UE):  X=${qx}  Y=${qy}  Z=${qz}  W=${qw}`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy all values', 2000);
+    });
+  }
+
+  // Allow Enter key to trigger conversion
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') convert();
+  });
+</script>
+</body>
+</html>

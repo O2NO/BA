@@ -1,0 +1,14 @@
+IESNA:LM-63-2002
+[TEST] LuxMeterCalc synthetic
+[MANUFAC] LuxMeterCalc
+[LUMINAIRE] Isotropic 1000 cd point source
+[LAMPCAT] synthetic
+[LAMP] synthetic
+[ISSUEDATE] 2026-04-30
+[OTHER] rated_lumens = 4*pi*1000 cd ~= 12566.37 lm; ideal isotropic source.
+TILT=NONE
+1 12566.37 1.0 3 1 1 2 0.0 0.0 0.0
+1.0 1.0 100.0
+0 90 180
+0
+1000 1000 1000
